@@ -1,7 +1,7 @@
+
 //=============================================================================
 //  MusE Score
 //  Linux Music Score Editor
-//  $Id: newwizard.cpp 5626 2012-05-13 18:33:52Z lasconic $
 //
 //  Copyright (C) 2008 Werner Schweer and others
 //
@@ -24,6 +24,7 @@
 #include "palette.h"
 #include "instrdialog.h"
 #include "scoreBrowser.h"
+#include "extension.h"
 
 #include "libmscore/instrtemplate.h"
 #include "libmscore/score.h"
@@ -274,18 +275,9 @@ NewWizardPage4::NewWizardPage4(QWidget* parent)
 
       templateFileBrowser = new ScoreBrowser;
       templateFileBrowser->setStripNumbers(true);
-      QDir dir(mscoreGlobalShare + "/templates");
-      QFileInfoList fil = dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Readable | QDir::Dirs | QDir::Files, QDir::Name);
-      if(fil.isEmpty()){
-          fil.append(QFileInfo(QFile(":data/Empty_Score.mscz")));
-          }
-
-      QDir myTemplatesDir(preferences.getString(PREF_APP_PATHS_MYTEMPLATES));
-      fil.append(myTemplatesDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Readable | QDir::Dirs | QDir::Files, QDir::Name));
-
       templateFileBrowser->setShowCustomCategory(true);
-      templateFileBrowser->setScores(fil);
       templateFileBrowser->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored));
+      buildTemplatesList();
 
       QVBoxLayout* layout = new QVBoxLayout;
       QHBoxLayout* searchLayout = new QHBoxLayout;
@@ -315,6 +307,31 @@ void NewWizardPage4::initializePage()
       {
       templateFileBrowser->show();
       path.clear();
+      }
+
+//---------------------------------------------------------
+//   buildTemplatesList
+//---------------------------------------------------------
+
+void NewWizardPage4::buildTemplatesList()
+      {
+
+      QDir dir(mscoreGlobalShare + "/templates");
+      QFileInfoList fil = dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Readable | QDir::Dirs | QDir::Files, QDir::Name);
+      if(fil.isEmpty()){
+          fil.append(QFileInfo(QFile(":data/Empty_Score.mscz")));
+          }
+
+      QDir myTemplatesDir(preferences.getString(PREF_APP_PATHS_MYTEMPLATES));
+      fil.append(myTemplatesDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Readable | QDir::Dirs | QDir::Files, QDir::Name));
+
+      // append templates directories from extensions
+      QStringList extensionsDir = Extension::getDirectoriesByType(Extension::templatesDir);
+      for (QString extDir : extensionsDir) {
+            QDir extTemplateDir(extDir);
+            fil.append(extTemplateDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Readable | QDir::Dirs | QDir::Files, QDir::Name));
+            }
+      templateFileBrowser->setScores(fil);
       }
 
 //---------------------------------------------------------
@@ -373,7 +390,7 @@ NewWizardPage5::NewWizardPage5(QWidget* parent)
       QGroupBox* b1 = new QGroupBox;
       b1->setTitle(tr("Key Signature"));
       b1->setAccessibleName(title());
-      sp = MuseScore::newKeySigPalette(PaletteType::ADVANCED);
+      sp = MuseScore::newKeySigPalette();
       sp->setMoreElements(false);
       sp->setShowContextMenu(false);
       sp->setSelectable(true);
@@ -393,7 +410,7 @@ NewWizardPage5::NewWizardPage5(QWidget* parent)
       _tempo = new QDoubleSpinBox;
       _tempo->setAccessibleName(tr("Beats per minute"));
       _tempo->setRange(20.0, 400.0);
-      _tempo->setValue(100.0);
+      _tempo->setValue(120.0);
       _tempo->setDecimals(1);
       QHBoxLayout* l2 = new QHBoxLayout;
       l2->addWidget(bpm);
@@ -429,13 +446,18 @@ NewWizard::NewWizard(QWidget* parent)
       {
       setObjectName("NewWizard");
       setWindowFlags(this->windowFlags() & ~Qt::WindowContextHelpButtonHint);
-      setWizardStyle(QWizard::ClassicStyle);
+      auto wizardStyleValue = QWizard::ModernStyle; //Modern Winsows look
+#ifdef Q_OS_MAC
+      wizardStyleValue = QWizard::MacStyle;
+      setOption(QWizard::CancelButtonOnLeft, true);
+#endif
+      setWizardStyle(wizardStyleValue);
+      
       setPixmap(QWizard::LogoPixmap, QPixmap(":/data/mscore.png"));
       setPixmap(QWizard::WatermarkPixmap, QPixmap());
       setWindowTitle(tr("New Score Wizard"));
 
       setOption(QWizard::NoCancelButton, false);
-      setOption(QWizard::CancelButtonOnLeft, true);
       setOption(QWizard::HaveFinishButtonOnEarlyPages, true);
       setOption(QWizard::HaveNextButtonOnLastPage, true);
 
@@ -464,7 +486,7 @@ NewWizard::NewWizard(QWidget* parent)
 
 void NewWizard::idChanged(int /*id*/)
       {
-      // printf("\n===\nWizard: id changed %d\n", id);
+//printf("\n===\nWizard: id changed %d\n", id);
       }
 
 //---------------------------------------------------------
@@ -505,6 +527,16 @@ bool NewWizard::emptyScore() const
       QFileInfo fi(p);
       bool val = fi.completeBaseName() == "00-Blank";
       return val;
+      }
+
+//---------------------------------------------------------
+//   updateValues
+//---------------------------------------------------------
+
+void NewWizard::updateValues() const
+      {
+      //p2->buildInstrumentsList();
+      p4->buildTemplatesList();
       }
 
 //---------------------------------------------------------

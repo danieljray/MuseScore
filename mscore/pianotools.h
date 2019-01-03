@@ -1,7 +1,6 @@
 //=============================================================================
 //  MusE Score
 //  Linux Music Score Editor
-//  $Id:$
 //
 //  Copyright (C) 2011-2016 Werner Schweer and others
 //
@@ -79,7 +78,8 @@ class HPiano : public QGraphicsView {
       void setPressedPitches(QSet<int> pitches);
       void pressPitch(int pitch);
       void releasePitch(int pitch);
-      void changeSelection(Selection selection);
+      void clearSelection();
+      void changeSelection(const Selection& selection);
       void updateAllKeys();
       virtual QSize sizeHint() const;
 
@@ -109,7 +109,8 @@ class PianoTools : public QDockWidget {
       void pressPitch(int pitch)    { _piano->pressPitch(pitch);   }
       void releasePitch(int pitch)  { _piano->releasePitch(pitch); }
       void heartBeat(QList<const Note*> notes);
-      void changeSelection(Selection selection);
+      void clearSelection();
+      void changeSelection(const Selection& selection);
       };
 
 

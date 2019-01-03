@@ -1,7 +1,6 @@
 //=============================================================================
 //  MusE Score
 //  Linux Music Score Editor
-//  $Id: editstyle.h 5403 2012-03-03 00:01:53Z miwarre $
 //
 //  Copyright (C) 2002-2010 Werner Schweer and others
 //
@@ -37,7 +36,7 @@ class Score;
 struct StyleWidget {
       Sid idx;
       bool showPercent;
-      QWidget* widget;
+      QObject* widget;
       QToolButton* reset;
       };
 
@@ -52,6 +51,8 @@ class EditStyle : public QDialog, private Ui::EditStyleBase {
       QPushButton* buttonApplyToAllParts;
       QButtonGroup* stemGroups[VOICES];
       QVector<StyleWidget> styleWidgets;
+      QButtonGroup* keySigNatGroup;
+      QButtonGroup* clefTypeGroup;
 
       virtual void hideEvent(QHideEvent*);
       QVariant getValue(Sid idx);
@@ -73,8 +74,14 @@ class EditStyle : public QDialog, private Ui::EditStyleBase {
       void systemMaxDistanceValueChanged(double);
       void resetStyleValue(int);
       void valueChanged(int);
-
+      void textStyleChanged(int);
+      void resetTextStyle(Pid);
+      void textStyleValueChanged(Pid, QVariant);
       void on_comboFBFont_currentIndexChanged(int index);
+      void on_buttonTogglePagelist_clicked();
+      void editUserStyleName();
+      void endEditUserStyleName();
+      void resetUserStyleName();
 
 public:
       static const int PAGE_NOTE = 6;

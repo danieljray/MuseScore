@@ -36,11 +36,10 @@ const std::vector<BreathType> Breath::breathList {
 //---------------------------------------------------------
 
 Breath::Breath(Score* s)
-  : Element(s)
+   : Element(s, ElementFlag::MOVABLE)
       {
       _symId = SymId::breathMarkComma;
       _pause = 0.0;
-      setFlags(ElementFlag::MOVABLE | ElementFlag::SELECTABLE);
       }
 
 //---------------------------------------------------------
@@ -77,7 +76,7 @@ void Breath::write(XmlWriter& xml) const
       {
       if (!xml.canWrite(this))
             return;
-      xml.stag("Breath");
+      xml.stag(this);
       writeProperty(xml, Pid::SYMBOL);
       writeProperty(xml, Pid::PAUSE);
       Element::writeProperties(xml);

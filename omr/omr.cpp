@@ -1,7 +1,6 @@
 //=============================================================================
 //  MusE Reader
 //  Music Score Reader
-//  $Id$
 //
 //  Copyright (C) 2010 Werner Schweer
 //
@@ -89,7 +88,7 @@ void Omr::write(XmlWriter& xml) const
       xml.tag("path", _path);
       xml.tag("spatium", _spatium);
       xml.tag("dpmm", _dpmm);
-      foreach(OmrPage* page, _pages) {
+      for(OmrPage* page : _pages) {
             page->write(xml);
             }
       xml.etag();
@@ -198,14 +197,14 @@ bool Omr::omrActions(int &ID, int page)
                   return false;
                   }
             int n = _doc->numPages();
-            printf("readPdf: %d pages\n", n);
+//printf("readPdf: %d pages\n", n);
             for (int i = 0; i < n; ++i) {
-                  OmrPage* page = new OmrPage(this);
+                  OmrPage* page1 = new OmrPage(this);
                   QImage image = _doc->page(i);
                   if (image.isNull())
                         return false;
-                  page->setImage(image);
-                  _pages.append(page);
+                  page1->setImage(image);
+                  _pages.append(page1);
                   }
 
             _spatium = 15.0; //constant spatium, image will be rescaled according to this parameter

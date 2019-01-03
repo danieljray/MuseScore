@@ -1,7 +1,6 @@
 //=============================================================================
 //  MusE Score
 //  Linux Music Score Editor
-//  $Id: musicxmlsupport.cpp 5595 2012-04-29 15:30:32Z lvinken $
 //
 //  Copyright (C) 2012 Werner Schweer and others
 //
@@ -79,7 +78,7 @@ bool NoteList::stavesOverlap(const int staff1, const int staff2) const
       for (int i = 0; i < _staffNoteLists.at(staff1).size(); ++i)
             for (int j = 0; j < _staffNoteLists.at(staff2).size(); ++j)
                   if (notesOverlap(_staffNoteLists.at(staff1).at(i), _staffNoteLists.at(staff2).at(j))) {
-                        // printf(" %d-%d", staff1, staff2);
+//printf(" %d-%d", staff1, staff2);
                         return true;
                         }
       return false;
@@ -202,8 +201,8 @@ static QString domElementPath(const QDomElement& e)
       QDomNode dn(e);
       while (!dn.parentNode().isNull()) {
             dn = dn.parentNode();
-            const QDomElement& e = dn.toElement();
-            const QString k(e.tagName());
+            const QDomElement& de = dn.toElement();
+            const QString k(de.tagName());
             if (!s.isEmpty())
                   s += ":";
             s += k;
